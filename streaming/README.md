@@ -8,7 +8,8 @@ python validate.py ../data/me_at_the_zoo.in ../out/me_at_the_zoo.out
 
 ## Greedy
 
-|:--------------------------|--------:|
+| data                      | score   |
+|:-------------------------:|:-------:|
 | trending_today.in         | 351576  |
 | videos_worth_spreading.in | 451845  |
 | kittens.in.txt            | 572959  |
