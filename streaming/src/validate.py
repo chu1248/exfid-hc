@@ -64,6 +64,10 @@ def load_output(data, filename):
                 "cache servers %s on line %s") % (
                     c, data.C, index)
 
+            assert len(v) == len(set(v)), (
+                "Videos are not unique on cache server %s "
+                "on line %s") % (c, index)
+
             total_storage = sum([
                 data.S[i] for i in v])
             assert 0 <= total_storage <= data.X, (

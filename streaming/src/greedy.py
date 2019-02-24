@@ -98,20 +98,22 @@ def optimize(data):
             if L_e == L:
                 continue
 
-            capacity = data.X
-            for v in results.get(c, []):
-                capacity -= data.S[v]
-                if capacity < 0:
-                    break
+            # If video R_v not in cache server
+            if R_v not in results.get(c, set()):
+                capacity = data.X
+                for v in results.get(c, set()):
+                    capacity -= data.S[v]
+                    if capacity < 0:
+                        break
 
-            if capacity - data.S[R_v] < 0:
-                continue
+                if capacity - data.S[R_v] < 0:
+                    continue
 
             L = L_e
             target_c = c
 
         if target_c >= 0:
-            results.setdefault(target_c, []).append(R_v)
+            results.setdefault(target_c, set()).add(R_v)
 
         pbar.update(1)
 

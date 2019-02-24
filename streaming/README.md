@@ -9,8 +9,8 @@ python validate.py ../data/me_at_the_zoo.in ../out/me_at_the_zoo.out
 ## Greedy
 
 |:--------------------------|--------:|
-| trending_today.in         | 351576  |
-| videos_worth_spreading.in | 451845  |
-| kittens.in.txt            | 572959  |
-| me_at_the_zoo.in          | 469480  |
-| Total                     | 1845860 |
+| trending_today.in         | 499981  |
+| videos_worth_spreading.in | 486584  |
+| kittens.in.txt            | 575416  |
+| me_at_the_zoo.in          | 490910  |
+| Total                     | 2052890 |
