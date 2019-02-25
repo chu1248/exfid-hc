@@ -17,3 +17,12 @@
 | videos_worth_spreading.in |  608295 |
 | me_at_the_zoo.in          |  507906 |
 
+## Greedy 3_fast
+
+| data                      | score   |
+|:-------------------------:|:-------:|
+| trending_today.in         |  499966 |
+| videos_worth_spreading.in |  608277 |
+| kittens.in.txt            | 1021680 |
+| me_at_the_zoo.in          |  507906 |
+| Total                     | 2637829 |

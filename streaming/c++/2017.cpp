@@ -106,6 +106,7 @@ void writeSol(){
 	sprintf(fName, "./output/%d/%011.3f_%d.out",cap,readableScore,time(NULL));
 	FILE* fout = fopen(fName, "w");
 	fprintf(fout,"%d\n",numSer);
+	
 	FR(i,0,numSer){
 		fprintf(fout, "%d", i);
 		FR(j,0,numSerV[i]) fprintf(fout, " %d", ser2VL[i][j]);
@@ -113,7 +114,7 @@ void writeSol(){
 	}
 	fclose(fout);
 	//printf("======Score: %lld %lld %f %f\n", score, bestScore, score *1000.0 / denom, bestScore * 1000.0 / denom);
-	printf("======Score: %011.3f %011.3f\n", readableScore, readableBestScore);
+	printf("======Score: %f %f\n", readableScore, readableBestScore);
 	outputCurrentTime();
 	
 }
@@ -352,6 +353,78 @@ void greedy_3_2(){
 	if(score > bestScore) bestScore = score;
 }
 
+int sumReq[1001][10001];
+void greedy_3_fast(){
+	FR(i,0,numEnd) FR(j,0,numV) sumReq[i][j] = 0;
+	FR(i,0,numReq) sumReq[req[i].end][req[i].video] += req[i].num;
+	// for cache video max save/size
+	// for request?
+	FR(i,0,numEnd) FR(j,0,numV) distEV[i][j] = lat[i];
+	int used[1001];
+	FR(i,0,numSer) used[i] = 0;
+	FR(i,0,numSer) numSerV[i] = 0;
+	long long pg = 0;
+	FR(i,0,numSer) FR(j,0,numV) cacheVBonus[i][j] = 0;
+	FR(i,0,numReq){
+		FR(j,0,numEdge[req[i].end]){
+			x = end2SerL[req[i].end][j].ser;
+			y = end2SerL[req[i].end][j].lat;
+			if(y < distEV[req[i].end][req[i].video]){
+				cacheVBonus[x][req[i].video] += req[i].num * (distEV[req[i].end][req[i].video] - y);
+			}
+		}
+	}
+	while(true){
+		bool picked = false;
+		double maxx = 0;
+		int pickSer, pickV;
+		FR(i,0,numSer){
+			FR(j,0,numV){
+				if(cacheVBonus[i][j] * 1.0 / vs[j] > maxx && used[i] + vs[j] <= cap){
+					maxx = cacheVBonus[i][j] * 1.0 / vs[j];
+					pickSer = i;
+					pickV = j;
+					picked = true;
+				}
+			}
+		}
+		if(!picked) break;
+		used[pickSer] += vs[pickV];
+		ser2VL[pickSer][numSerV[pickSer]++] = pickV;
+		pg += cacheVBonus[pickSer][pickV];
+		// for pick ser and pick v, propagate back to bonus? ser -> all related end point -> update related server for that video
+		FR(i,0,numEnd){
+			FR(j,0,numEdge[i]){
+				if(end2SerL[i][j].ser != pickSer) continue;
+				// O(numEnd) each end point enters here at most once
+				y = end2SerL[i][j].lat;
+				if(y < distEV[i][pickV]){
+					// update related server bonus
+					FR(k,0,numEdge[i]){
+						// O(numEnd * numEdge)
+						z = end2SerL[i][k].ser;
+						// distEV[i][pickV], y, end2SerL[i][k].lat
+						if(end2SerL[i][k].lat > distEV[i][pickV]){
+							continue;
+						}else if(y < end2SerL[i][k].lat){
+							cacheVBonus[z][pickV] -= sumReq[i][pickV] * (distEV[i][pickV] - end2SerL[i][k].lat);
+						}else{
+							cacheVBonus[z][pickV] -= sumReq[i][pickV] * (distEV[i][pickV] - y);							
+						}
+					}
+					distEV[i][pickV] = y;
+				}
+			}
+		}
+		z = 0;
+		FR(i,0,numSer) z += cap - used[i];
+		printf("progress: %lld %f %d %d %d\n", pg, pg * 1000.0 / denom, pickSer, pickV, z);
+		outputCurrentTime();
+	}
+	score = calc();
+	if(score > bestScore) bestScore = score;
+}
+
 void readSol(const char* path){
 	ifstream fin(path);
 	FR(i,0,numSer) numSerV[i] = 0;
@@ -369,7 +442,10 @@ int main()
 	greedy_0(); printf("Done greedy 0\n"); writeSol();
 	greedy_1(); printf("Done greedy 1\n"); writeSol();
 	greedy_2(); printf("Done greedy 2\n"); writeSol();
-	greedy_3(); printf("Done greedy 3_2\n"); writeSol();
+	//greedy_3(); printf("Done greedy 3\n"); writeSol();
+	//greedy_3_1(); printf("Done greedy 3_1\n"); writeSol();
+	//greedy_3_2(); printf("Done greedy 3_2\n"); writeSol();
+	greedy_3_fast(); printf("Done greedy 3_fast\n"); writeSol();
 	
 	//greedyWithRand(); printf("Done greedy with rand\n");
 	//readSol(".\\output\\0903146_1550509764.out");
