@@ -189,7 +189,6 @@ void greedy_3(){
 	long long pg = 0;
 	map<int, long long> cacheVBonus[1001];
 	while(true){
-		outputCurrentTime();
 		FR(i,0,numSer) cacheVBonus[i].clear();
 		FR(i,0,numReq){
 			FR(j,0,numEdge[req[i].end]){
@@ -200,19 +199,17 @@ void greedy_3(){
 				}
 			}
 		}
-		outputCurrentTime();
 		bool picked = false;
 		double maxx = 0;
 		int pickSer, pickV;
 		FR(i,0,numSer){
-			printf("Count: %d\n",cacheVBonus[i].size());
+			//printf("Count: %d\n",cacheVBonus[i].size());
 			for(auto const& kvp : cacheVBonus[i]){
 				if(kvp.second * 1.0 / vs[kvp.first] > maxx && used[i] + vs[kvp.first] <= cap){
 					maxx = kvp.second * 1.0 / vs[kvp.first];
 					pickSer = i;
 					pickV = kvp.first;
 					picked = true;
-					used[i] += vs[kvp.first];
 				}
 			}
 		}
@@ -226,6 +223,7 @@ void greedy_3(){
 					}
 				}
 			}
+			used[pickSer] += vs[pickV];
 			ser2VL[pickSer][numSerV[pickSer]++] = pickV;
 			pg += cacheVBonus[pickSer][pickV];
 			z = 0;
@@ -267,11 +265,11 @@ void greedy_3_1(){
 					pickSer = i;
 					pickV = j;
 					picked = true;
-					used[i] += vs[j];
 				}
 			}
 		}
 		if(picked){
+			used[pickSer] += vs[pickV];
 			FR(i,0,numEnd){
 				FR(j,0,numEdge[i]){
 					if(end2SerL[i][j].ser != pickSer) continue;
@@ -371,7 +369,7 @@ int main()
 	greedy_0(); printf("Done greedy 0\n"); writeSol();
 	greedy_1(); printf("Done greedy 1\n"); writeSol();
 	greedy_2(); printf("Done greedy 2\n"); writeSol();
-	greedy_3_2(); printf("Done greedy 3_2\n"); writeSol();
+	greedy_3(); printf("Done greedy 3_2\n"); writeSol();
 	
 	//greedyWithRand(); printf("Done greedy with rand\n");
 	//readSol(".\\output\\0903146_1550509764.out");
